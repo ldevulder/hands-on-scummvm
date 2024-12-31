@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -exv
+
+# Variable(s)
+typeset -ri DISP_NUM=10
+
+# Get container IP
+IP=$(ip address show dev eth0 | grep -Po 'inet \K[\d.]+')
+
+# Start ScummVM through Xfvb and VNC
+setsid xvfb-run --server-num=${DISP_NUM} --server-args="-screen 0, 640x480x16" scummvm > /tmp/scummvm.log 2>&1 &
+x11vnc -bg -reopen -forever -display :${DISP_NUM}
+novnc_server --listen ${IP}:6080
